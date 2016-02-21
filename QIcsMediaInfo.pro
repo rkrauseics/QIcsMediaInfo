@@ -12,9 +12,11 @@ SOURCES += main.cpp
 QMAKE_CXXFLAGS += -DUNICODE
 #QMAKE_LFLAGS += -stdlib=libc++
 
-MEDIA_INFO_DIR=/Users/rkrause/Downloads/MediaInfo_CLI_GNU_FromSource
+MEDIA_INFO_DIR=/Users/rkrause/src/cpp/MediaInfo/MediaInfoLib/Source
+ZENLIB_DIR=/Users/rkrause/src/cpp/MediaInfo/ZenLib/Source
 
-INCLUDEPATH += $${MEDIA_INFO_DIR}/ZenLib/Source
-INCLUDEPATH += $${MEDIA_INFO_DIR}/MediaInfoLib/Source
-LIBS += -L$${MEDIA_INFO_DIR}/MediaInfoLib/Project/GNU/Library -lmediainfo
-LIBS += -L$${MEDIA_INFO_DIR}/ZenLib/Project/GNU/Library -lzen -lz
+INCLUDEPATH += $${ZENLIB_DIR}
+INCLUDEPATH += $${MEDIA_INFO_DIR}
+
+LIBS += -L$${MEDIA_INFO_DIR}/Library -lMediaInfo
+LIBS += -L$${ZENLIB_DIR}/Library -lZenLib -lz

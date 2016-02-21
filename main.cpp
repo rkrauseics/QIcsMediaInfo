@@ -23,9 +23,12 @@
 #include <sstream>
 
 //#include "ZenLib/Ztring.h" //Note : I need it for universal atoi, but you have not to use it for be able to use MediaInfoLib
-#include "MediaInfoDLL/MediaInfoDLL_Static.h"
+//#include "MediaInfoDLL/MediaInfoDLL_Static.h"
+#include "MediaInfo/MediaInfo.h"
+#include "MediaInfo/MediaInfoList.h"
 
-using namespace MediaInfoDLL;
+//using namespace MediaInfoDLL;
+using namespace MediaInfoLib;
 //using namespace ZenLib;
 
 //#define USE_STD_STRING 1
@@ -66,7 +69,7 @@ int main(int argc, char *argv[])
         qDebug() << Q_FUNC_INFO << qPrintable("\r\n\r\nInfo_Codecs\r\n") << qPrintable(infoCodecs);
 
         qDebug() << Q_FUNC_INFO << qPrintable("\r\n\r\nOpen\r\n");
-        MI.Open(__T("/Volumes/PATRIOT/Genivi Demo/all_mp3_files"));
+        MI.Open(__T("/Volumes/rkrause/mm2_test"));
         qDebug() << Q_FUNC_INFO << qPrintable("\r\n\r\nInform with Complete=false\r\n");
         MI.Option(__T("Complete"));
         QString standardInform=QString::fromStdWString(MI.Inform().c_str());
