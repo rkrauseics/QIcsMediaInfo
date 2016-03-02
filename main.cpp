@@ -66,12 +66,19 @@ int main(int argc, char *argv[])
     QString infoVersion=QString::fromStdWString(MI.Option(__T("Info_Version"), __T("0.7.82;MediaInfo_Example;0.7.82")).c_str());
     qDebug() << Q_FUNC_INFO << "Info_Version" << infoVersion;
 
+    // TODO:
+    // Commandline options for
+    // -p --params
+    // -c --codecs
+    // -g general -s sound -v video -a all
+    // output is json
+    // argument is a directory
+    //
+// if --params
 //        QString infoParameters=QString::fromStdWString( MI.Option(__T("Info_Parameters")));
 //        qDebug() << Q_FUNC_INFO << "\r\n\r\nInfo_Parameters\r\n" << qPrintable(infoParameters);
 
-//        QString infoCapacities=QString::fromStdWString( MI.Option(__T("Info_Capacities")).c_str() );
-//        qDebug() << Q_FUNC_INFO << "infoCapacities" << qPrintable(infoCapacities);
-
+// if --codecs
 //        QString infoCodecs=QString::fromStdWString( MI.Option(__T("Info_Codecs")).c_str() );
 //        qDebug() << Q_FUNC_INFO << qPrintable("\r\n\r\nInfo_Codecs\r\n") << qPrintable(infoCodecs);
 
@@ -89,18 +96,22 @@ int main(int argc, char *argv[])
 //        QString completeInform=QString::fromStdWString(MI.Inform().c_str());
 //        qDebug() << Q_FUNC_INFO << qPrintable(completeInform);
 
+        // if -a || -g
         MI.Option(QStringLiteral("Inform").toStdWString(), generalInform.toStdWString());
         QString informOptionExample=QString::fromStdWString(MI.Inform());
         qDebug() << qPrintable("\r\n\r\nGeneral Inform\r\n") << qPrintable(informOptionExample);
 
+        // if -a || -v
         MI.Option(QStringLiteral("Inform").toStdWString(), videoInform.toStdWString());
         QString videoOptionExample=QString::fromStdWString(MI.Inform());
         qDebug() << qPrintable("\r\n\r\nVideo Inform\r\n") << qPrintable(videoOptionExample);
 
+        // if -a || -s
         MI.Option(QStringLiteral("Inform").toStdWString(), audioInform.toStdWString());
         QString audioOptionExample=QString::fromStdWString(MI.Inform());
         qDebug() << qPrintable("\r\n\r\nAudio Inform\r\n") << qPrintable(audioOptionExample);
 
+        //
 //        QString generalFileSize=QString::fromStdWString(MI.Get(1,Stream_General, 0, __T("FileSize"), Info_Text, Info_Name));
 //        qDebug() << Q_FUNC_INFO << "General: FileSize:" << generalFileSize;
 
@@ -109,3 +120,25 @@ int main(int argc, char *argv[])
 //    return a.exec();
 }
 
+
+//nfiles=MI.Open(dirPath.toStdWString(),MediaInfoLib::FileOption_NoRecursive);
+//QStringList informResult=informOptionExample.split('\n',QString::SkipEmptyParts);
+//QVariantMap resMap;
+//foreach (QString res, informResult) {
+//    qDebug() << Q_FUNC_INFO << res;
+//    QStringList resList=res.split(":");
+////        qDebug() << resList.count() << generalParams.count();
+//    Q_ASSERT((resList.count()-1)==generalParams.count());
+//    for (int i=0;i<resList.count()-1;++i) {
+//        qDebug() << generalParams[i] << ":" << resList[i];
+//        resMap[generalParams[i]] = resList[i];
+//    }
+//    QJsonObject resObject=QJsonObject::fromVariantMap(resMap);
+//    QString mimeType=resMap["InternetMediaType"].toString();
+//    if (mimeType.startsWith("audio")) m_audioFiles.append(resObject);
+//    else if (mimeType.startsWith("video")) m_videoFiles.append(resObject);
+//    else {
+//        qWarning() << Q_FUNC_INFO << "mimetype for file" << resMap["CompleteName"]<< "not one of audio or video but" << resMap["InternetMediaType"];
+//    }
+//    qDebug() << Q_FUNC_INFO << "resObject" << resObject;
+//}
