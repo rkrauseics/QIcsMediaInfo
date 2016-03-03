@@ -6,6 +6,7 @@ This is a small wrapper for MediaInfo that uses MediaInfoLib, builds using Qt's 
 For the time being QIcsMediaInfo requires to be built against the static libraries built with my personal forks of MediaInfoLib and ZenLib found here:
 
 https://github.com/rokrau/MediaInfoLib
+
 https://github.com/rokrau/ZenLib
 
 Both of these can be compiled as static libraries using qmake with .pro files found in the respective Contrib directories. 
