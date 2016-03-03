@@ -4,7 +4,8 @@
 #include <QDebug>
 
 #include <QCoreApplication>
-
+#include <QCommandLineParser>
+#include <QTimer>
 #include "MediaInfo/MediaInfo.h"
 #include "MediaInfo/MediaInfoList.h"
 
@@ -73,18 +74,35 @@ int main(int argc, char *argv[])
     // -g general -s sound -v video -a all
     // output is json
     // argument is a directory
+    QCommandLineParser cmdLine;
+    QCommandLineOption parametersOptions(QStringList() << "p" << "params");
+    cmdLine.addOption(parametersOptions);
+    QCommandLineOption codecsOptions(QStringList() << "c" << "codecs");
+    cmdLine.addOption(codecsOptions);
+    QCommandLineOption generalOptions("g");
+    cmdLine.addOption(generalOptions);
+    QCommandLineOption soundOptions("s");
+    cmdLine.addOption(soundOptions);
+    QCommandLineOption videoOptions("v");
+    cmdLine.addOption(videoOptions);
+    QCommandLineOption allOptions("a");
+    cmdLine.addOption(allOptions);
+    cmdLine.process(a);
     //
 // if --params
-//        QString infoParameters=QString::fromStdWString( MI.Option(__T("Info_Parameters")));
-//        qDebug() << Q_FUNC_INFO << "\r\n\r\nInfo_Parameters\r\n" << qPrintable(infoParameters);
-
+    if(cmdLine.isSet(parametersOptions)){
+        QString infoParameters=QString::fromStdWString( MI.Option(__T("Info_Parameters")));
+        qDebug() << Q_FUNC_INFO << "\r\n\r\nInfo_Parameters\r\n" << qPrintable(infoParameters);
+    }
 // if --codecs
-//        QString infoCodecs=QString::fromStdWString( MI.Option(__T("Info_Codecs")).c_str() );
-//        qDebug() << Q_FUNC_INFO << qPrintable("\r\n\r\nInfo_Codecs\r\n") << qPrintable(infoCodecs);
+    if(cmdLine.isSet(codecsOptions)){
+        QString infoCodecs=QString::fromStdWString( MI.Option(__T("Info_Codecs")).c_str() );
+        qDebug() << Q_FUNC_INFO << qPrintable("\r\n\r\nInfo_Codecs\r\n") << qPrintable(infoCodecs);
+    }
 
-        qDebug() << Q_FUNC_INFO << qPrintable("\r\n\r\nOpen\r\n");
-        const int nfiles=MI.Open(__T("/Volumes/rkrause/mm2_test"));
-        qDebug() << Q_FUNC_INFO << "Opened" << nfiles << "files";
+    qDebug() << Q_FUNC_INFO << qPrintable("\r\n\r\nOpen\r\n");
+    const int nfiles=MI.Open(__T("/Users/bquinn/Downloads/mp3s"));
+    qDebug() << Q_FUNC_INFO << "Opened" << nfiles << "files";
 
 //        qDebug() << Q_FUNC_INFO << qPrintable("\r\n\r\nInform with Complete=false\r\n");
 //        MI.Option(__T("Complete"));
@@ -96,28 +114,35 @@ int main(int argc, char *argv[])
 //        QString completeInform=QString::fromStdWString(MI.Inform().c_str());
 //        qDebug() << Q_FUNC_INFO << qPrintable(completeInform);
 
-        // if -a || -g
+    // if -a || -g
+    if(cmdLine.isSet(generalOptions) || cmdLine.isSet(allOptions)){
+
         MI.Option(QStringLiteral("Inform").toStdWString(), generalInform.toStdWString());
         QString informOptionExample=QString::fromStdWString(MI.Inform());
         qDebug() << qPrintable("\r\n\r\nGeneral Inform\r\n") << qPrintable(informOptionExample);
+}
 
-        // if -a || -v
+    // if -a || -v
+    if(cmdLine.isSet(videoOptions) || cmdLine.isSet(allOptions)){
         MI.Option(QStringLiteral("Inform").toStdWString(), videoInform.toStdWString());
         QString videoOptionExample=QString::fromStdWString(MI.Inform());
         qDebug() << qPrintable("\r\n\r\nVideo Inform\r\n") << qPrintable(videoOptionExample);
+}
 
-        // if -a || -s
+    // if -a || -s
+    if(cmdLine.isSet(soundOptions) || cmdLine.isSet(allOptions)){
         MI.Option(QStringLiteral("Inform").toStdWString(), audioInform.toStdWString());
         QString audioOptionExample=QString::fromStdWString(MI.Inform());
         qDebug() << qPrintable("\r\n\r\nAudio Inform\r\n") << qPrintable(audioOptionExample);
+}
 
-        //
+//
 //        QString generalFileSize=QString::fromStdWString(MI.Get(1,Stream_General, 0, __T("FileSize"), Info_Text, Info_Name));
 //        qDebug() << Q_FUNC_INFO << "General: FileSize:" << generalFileSize;
 
         MI.Close();
-
-//    return a.exec();
+        QTimer::singleShot(nfiles * 100, &a, SLOT(quit()));
+       return a.exec();
 }
 
 
