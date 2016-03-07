@@ -78,8 +78,6 @@ int main(int argc, char *argv[])
 //    qDebug() << Q_FUNC_INFO << "Info_Version" << infoVersion;
 
     // TODO:
-    // output is json
-    // argument is a directory
     QCommandLineParser cmdLine;
     QCommandLineOption parametersOptions(QStringList() << "p" << "params");
     cmdLine.addOption(parametersOptions);
@@ -93,6 +91,9 @@ int main(int argc, char *argv[])
     cmdLine.addOption(videoOptions);
     QCommandLineOption allOptions("a");
     cmdLine.addOption(allOptions);
+    QCommandLineOption outputOptions(QStringList() << "o" << "output",  QCoreApplication::translate("main", "Destination file."),"std");
+    cmdLine.addOption(outputOptions);
+
     cmdLine.process(a);
 
     // if --params
@@ -108,17 +109,28 @@ int main(int argc, char *argv[])
 
 //    qDebug() << Q_FUNC_INFO << qPrintable("\r\n\r\nOpen\r\n");
     QString dirPath ="";
-    if(cmdLine.positionalArguments().count() == 1)
+    if(cmdLine.positionalArguments().count() > 0)
         dirPath = cmdLine.positionalArguments()[0];
 
     QDir inDir(dirPath);
     if(!inDir.exists()){
         MI.Close();
-        qFatal( dirPath.toLocal8Bit() + "does not exist");
+        qFatal( dirPath.toLocal8Bit() + " does not exist");
     }
     else{
+
+        QFile outFile;
+        QTextStream outStream(stderr);
+        //if -o and given a destination
+        if(cmdLine.value(outputOptions) != "std" ){
+            outFile.setFileName(cmdLine.value(outputOptions));
+            if(outFile.open(QIODevice::WriteOnly)){
+                outStream.setDevice(&outFile);
+            }
+        }
+
         nfiles = MI.Open(dirPath.toStdWString(),MediaInfoLib::FileOption_NoRecursive);
-        qDebug() << Q_FUNC_INFO << "Opened" << nfiles << "files";
+        outStream << Q_FUNC_INFO << "Opened " << nfiles << " files";
 
 //        qDebug() << Q_FUNC_INFO << qPrintable("\r\n\r\nInform with Complete=false\r\n");
 //        MI.Option(__T("Complete"));
@@ -154,6 +166,7 @@ int main(int argc, char *argv[])
 //            qDebug() << qPrintable("\r\n\r\nAudio Inform\r\n") << qPrintable(audioOptionExample);
         }
 
+
         QJsonDocument outDoc;
         foreach(QString section, infoMap.keys())
         {
@@ -161,14 +174,16 @@ int main(int argc, char *argv[])
             if(informResult.last().isEmpty())
                 informResult.pop_back();
             QVariantMap resMap;
-           qDebug() << qPrintable(section) <<" Information";
+
+            outStream << qPrintable(section) <<" Information";
+
             foreach (QString res, informResult) {
                 QStringList resList = res.split(QRegularExpression(":(?!\\\\)"));
-                if(resResult.last().isEmpty())
-                    resResult.pop_back();
-                Q_ASSERT(resList.count() == generalParams.count());
+                if(resList.last().isEmpty())
+                    resList.pop_back();
+                Q_ASSERT(resList.count() == parametersMap[section].count());
                 for (int i = 0;i < parametersMap[section].count(); i++) {
-                        resMap[parametersMap[section][i]] = resList[i];
+                    resMap[parametersMap[section][i]] = resList[i];
                 }
                 QJsonObject resObject=QJsonObject::fromVariantMap(resMap);
                 QString mimeType=resMap["InternetMediaType"].toString().toLower();
@@ -177,7 +192,8 @@ int main(int argc, char *argv[])
                 }
                 else{
                     outDoc.setObject(resObject);
-                    qDebug()<< qPrintable(outDoc.toJson());
+                        outStream << qPrintable(outDoc.toJson());
+
                 }
             }
         }
