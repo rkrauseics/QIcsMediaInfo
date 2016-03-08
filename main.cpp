@@ -18,7 +18,7 @@ using namespace MediaInfoLib;
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
-    // Create Options for MediaInfo, there is a bunch more but these seem somewhat relevant
+    // Create Options for MediaInfo, there is a bunch more but these seem somewhat most relevant
     QStringList generalParams;
     generalParams << "CompleteName" << "FolderName" << "FileName" << "FileExtension"
                   << "FileSize" << "Duration" << "FrameRate" << "BitRate" << "BitRate_Mode/String"
@@ -37,13 +37,14 @@ int main(int argc, char *argv[])
         generalInform += QString("\%%1\%:").arg(s);
     }
     generalInform+="\\n";
-
+    // Create a MediaInforList object, this is for parsing entire directories
     MediaInfoList MI;
     MI.Option(__T("ParseSpeed"), __T("0"));
     MI.Option(__T("Language"), __T("raw"));
     MI.Option(__T("ReadByHuman"), __T("0"));
     MI.Option(__T("Legacy"), __T("0"));
 
+    // Setup some command line options
     QCommandLineParser cmdLine;
     QCommandLineOption parametersOptions(QStringList() << "p" << "params");
     cmdLine.addOption(parametersOptions);
@@ -92,17 +93,18 @@ int main(int argc, char *argv[])
             outStream.setDevice(&outFile);
         }
     }
-
+    // This causes MediaInfo to open all files in the directory
     int nfiles = MI.Open(dirPath.toStdWString(),MediaInfoLib::FileOption_NoRecursive);
     qDebug() << Q_FUNC_INFO << "Opened " << nfiles << " files";
-
+    // Now we query MediaInfoLib for the data we are interested and receive everything in one string
     MI.Option(QStringLiteral("Inform").toStdWString(), generalInform.toStdWString());
     QString informOptionResult=QString::fromStdWString(MI.Inform());
-
+    // Done - be good and close the MediaInfo object
     MI.Close();
 
-    QJsonArray m_audioFiles;
-    QJsonArray m_videoFiles;
+    // Trivial bit of QJson<Magic> and output
+    QJsonArray audioFiles;
+    QJsonArray videoFiles;
     QStringList informResult=informOptionResult.split('\n',QString::SkipEmptyParts);
     if (informOptionResult.isEmpty()) {
         qWarning() << "could not find audio or video files in:" << dirPath;
@@ -117,15 +119,15 @@ int main(int argc, char *argv[])
         }
         QJsonObject resObject=QJsonObject::fromVariantMap(resMap);
         QString mimeType=resMap["InternetMediaType"].toString();
-        if (mimeType.startsWith("audio")) m_audioFiles.append(resObject);
-        else if (mimeType.startsWith("video")) m_videoFiles.append(resObject);
+        if (mimeType.startsWith("audio")) audioFiles.append(resObject);
+        else if (mimeType.startsWith("video")) videoFiles.append(resObject);
         else {
             qWarning() << Q_FUNC_INFO << "mimetype for file" << resMap["CompleteName"]<< "not one of audio or video but" << resMap["InternetMediaType"];
         }
     }
     QJsonObject jsonObject;
-    if (!m_audioFiles.isEmpty()) jsonObject.insert("audio",m_audioFiles);
-    if (!m_videoFiles.isEmpty()) jsonObject.insert("video",m_videoFiles);
+    if (!audioFiles.isEmpty()) jsonObject.insert("audio",audioFiles);
+    if (!videoFiles.isEmpty()) jsonObject.insert("video",videoFiles);
     QJsonDocument jsonDoc(jsonObject);
     outStream << qPrintable(jsonDoc.toJson());
 }
