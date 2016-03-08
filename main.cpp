@@ -120,7 +120,7 @@ int main(int argc, char *argv[])
     else{
 
         QFile outFile;
-        QTextStream outStream(stderr);
+        QTextStream outStream(stdout);
         //if -o and given a destination
         if(cmdLine.value(outputOptions) != "std" ){
             outFile.setFileName(cmdLine.value(outputOptions));
@@ -130,7 +130,7 @@ int main(int argc, char *argv[])
         }
 
         nfiles = MI.Open(dirPath.toStdWString(),MediaInfoLib::FileOption_NoRecursive);
-        outStream << Q_FUNC_INFO << "Opened " << nfiles << " files";
+        qDebug() << Q_FUNC_INFO << "Opened " << nfiles << " files";
 
 //        qDebug() << Q_FUNC_INFO << qPrintable("\r\n\r\nInform with Complete=false\r\n");
 //        MI.Option(__T("Complete"));
