@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
     QString generalInform;
     generalInform="General;";
     foreach(QString s, generalParams) {
-        generalInform += QString("\%%1\%:").arg(s);
+        generalInform += QString("\%%1\%|").arg(s);
     }
     generalInform+="\\n";
     // Create a MediaInforList object, this is for parsing entire directories
@@ -112,7 +112,7 @@ int main(int argc, char *argv[])
     }
     QVariantMap resMap;
     foreach (QString res, informResult) {
-        QStringList resList=res.split(":");
+        QStringList resList=res.split("|");
         Q_ASSERT((resList.count()-1)==generalParams.count());
         for (int i=0;i<resList.count()-1;++i) {
             resMap[generalParams[i]] = resList[i];
