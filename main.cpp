@@ -50,13 +50,12 @@ int main(int argc, char *argv[])
                   << "Encoded_Application" << "Encoded_Library" << "BPM"
                   << "Cover" << "Cover_Mime" << "Lyrics"
                   << "Added_Date";
-    QString generalInform;
-    generalInform="General;";
+    QString generalInform=QStringLiteral("General;");
     foreach(QString s, generalParams) {
         generalInform += QString("\%%1\%|").arg(s);
     }
     generalInform+="\\n";
-    // Create a MediaInforList object, this is for parsing entire directories
+    // Create a MediaInfoList object, this is for parsing entire directories
     MediaInfoList MI;
     MI.Option(__T("ParseSpeed"), __T("0"));
     MI.Option(__T("Language"), __T("raw"));
